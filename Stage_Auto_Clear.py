@@ -120,11 +120,13 @@ for try_count in range(100000):
             pyautogui.click(battle_start)
             time.sleep(3)
 
-            # 진영 버프 미 배치 혹은 듀라 버프 영웅을 사용 하지 않아도 전투를 하도록 처리
+            # 진영 버프 미 배치 혹은 진영 버프 비활성화, 듀라 버프 영웅을 사용 하지 않아도 전투를 하도록 처리
             no_trait_bonus = find_image_on_screen(AFK_Stage_Images_route + '/No_Trait_Bonus.PNG', threshold=0.8)
             no_buff_hero = find_image_on_screen(AFK_Stage_Images_route + '/No_Buff_Hero.PNG', threshold=0.8)
+            no_season_buff = find_image_on_screen(AFK_Stage_Images_route + '/No_Season_Buff.PNG', threshold=0.8)
+            no_echo = find_image_on_screen(AFK_Stage_Images_route + '/No_Echo.PNG', threshold=0.8)
 
-            if no_trait_bonus or no_buff_hero:
+            if no_trait_bonus or no_buff_hero or no_season_buff or no_echo:
                 yes_button = find_image_on_screen(AFK_Stage_Images_route + '/Yes_Button.PNG', threshold=0.8)
                 pyautogui.click(yes_button)
                 time.sleep(3)
@@ -142,6 +144,7 @@ for try_count in range(100000):
         elif stage_clear_coords:
             print("스테이지 클리어")
             next_stage = find_image_on_screen(AFK_Stage_Images_route + '/Next_Stage.PNG', threshold=0.8)
+            next_season = find_image_on_screen(AFK_Stage_Images_route + '/Next_Season.PNG', threshold=0.8)
             next_dura = find_image_on_screen(AFK_Stage_Images_route + '/Next_Dura.PNG', threshold=0.8)
             next_tower = find_image_on_screen(AFK_Stage_Images_route + '/Next_Tower.PNG', threshold=0.8)
             time.sleep(3)
@@ -149,12 +152,19 @@ for try_count in range(100000):
 
             if next_dura:
                 pyautogui.click(next_dura)
+                time.sleep(3)
+                break
+            elif next_season:
+                pyautogui.click(next_season)
+                time.sleep(3)
                 break
             elif next_tower:
                 pyautogui.click(next_tower)
+                time.sleep(3)
                 break
             elif next_stage:
                 pyautogui.click(next_stage)
+                time.sleep(3)
                 break
 
             break
