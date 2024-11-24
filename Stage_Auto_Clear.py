@@ -45,20 +45,37 @@ def find_image_on_screen(template_path, threshold=0.8):
 # 매크로 실행 루프
 Fail_count, Success_count = 0, 0
 
+
+stage_fail_count = 0
+stage_try_count = 0
+current_stage = "Normal"
 # 무한히 시도
 for try_count in range(100000):
-    stage_fail_count = 0
-    stage_try_count = 0
+
+
 
     # 한 스테이지 반복
-    for stage_try_count in range(100):
-        clear_log_coords = find_image_on_screen(AFK_Stage_Images_route + '/Clear_Log.PNG', threshold=0.8)
-        stage_fail_coords = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Fail.PNG', threshold=0.8)
-        stage_clear_coords = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Clear.PNG', threshold=0.8)
+    for stage_try_count in range(1000):
+        clear_log = find_image_on_screen(AFK_Stage_Images_route + '/Clear_Log.PNG', threshold=0.8)
+        stage_fail = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Fail.PNG', threshold=0.8)
+        stage_clear = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Clear.PNG', threshold=0.8)
+        first_multi_clear = find_image_on_screen(AFK_Stage_Images_route + '/First_Multi_Clear.PNG', threshold=0.8)
+        main_screen = find_image_on_screen(AFK_Stage_Images_route + '/Main_Screen.PNG', threshold=0.8)
 
-        if clear_log_coords:
+        if main_screen:
+            if current_stage == "Normal":
+                next_stage = find_image_on_screen(AFK_Stage_Images_route + '/Next_Stage.PNG', threshold=0.8)
+                pyautogui.click(next_stage)
+                time.sleep(3)
+            elif current_stage == "Season":
+                next_season = find_image_on_screen(AFK_Stage_Images_route + '/Next_Season.PNG', threshold=0.8)
+                pyautogui.click(next_season)
+                time.sleep(3)
+
+
+        elif clear_log:
             print("클리어 로그 클릭")
-            pyautogui.click(clear_log_coords)
+            pyautogui.click(clear_log)
             time.sleep(3)
 
             tmp_start = 0
@@ -133,7 +150,7 @@ for try_count in range(100000):
 
 
         # 전투 실패
-        elif stage_fail_coords:
+        elif stage_fail:
             print("전투 실패")
             stage_fail_count += 1
             battle_retry = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Retry.PNG', threshold=0.8)
@@ -141,14 +158,16 @@ for try_count in range(100000):
             pyautogui.click(battle_retry)
 
         # 스테이지 클리어 후 다음 스테이지로 이동
-        elif stage_clear_coords:
+        elif stage_clear:
             print("스테이지 클리어")
             next_stage = find_image_on_screen(AFK_Stage_Images_route + '/Next_Stage.PNG', threshold=0.8)
             next_season = find_image_on_screen(AFK_Stage_Images_route + '/Next_Season.PNG', threshold=0.8)
             next_dura = find_image_on_screen(AFK_Stage_Images_route + '/Next_Dura.PNG', threshold=0.8)
             next_tower = find_image_on_screen(AFK_Stage_Images_route + '/Next_Tower.PNG', threshold=0.8)
-            time.sleep(3)
 
+            stage_fail_count = 0
+
+            time.sleep(3)
 
             if next_dura:
                 pyautogui.click(next_dura)
@@ -169,6 +188,64 @@ for try_count in range(100000):
 
             break
 
+        elif first_multi_clear:
+            print("멀티 첫 스테이지 클리어")
+            next_multi_stage = find_image_on_screen(AFK_Stage_Images_route + '/Next_Multi.PNG', threshold=0.8)
+            pyautogui.click(next_multi_stage)
+            time.sleep(3)
+
+            battle_start = find_image_on_screen(AFK_Stage_Images_route + '/Battle_Start.PNG', threshold=0.8)
+            pyautogui.click(battle_start)
+            time.sleep(3)
+
+            while True:
+                multi_battle_fail = find_image_on_screen(AFK_Stage_Images_route + '/Next_Multi.PNG', threshold=0.8)
+                stage_clear = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Clear.PNG', threshold=0.8)
+
+                if stage_clear:
+                    next_stage = find_image_on_screen(AFK_Stage_Images_route + '/Next_Stage.PNG', threshold=0.8)
+                    next_season = find_image_on_screen(AFK_Stage_Images_route + '/Next_Season.PNG', threshold=0.8)
+
+                    stage_fail_count = 0
+
+                    if next_season:
+                        pyautogui.click(next_season)
+                        time.sleep(3)
+                        break
+                    elif next_stage:
+                        pyautogui.click(next_stage)
+                        time.sleep(3)
+                        break
+
+                elif multi_battle_fail:
+                    next_multi_stage = find_image_on_screen(AFK_Stage_Images_route + '/Next_Multi.PNG', threshold=0.8)
+                    pyautogui.click(next_multi_stage)
+
+                    time.sleep(3)
+
+                    season_stage = find_image_on_screen(AFK_Stage_Images_route + '/Season_Stage.PNG', threshold=0.8)
+                    normal_stage = find_image_on_screen(AFK_Stage_Images_route + '/Normal_Stage.PNG', threshold=0.8)
+                    stage_cancel = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Cancel.PNG', threshold=0.8)
+
+                    if season_stage:
+                        current_stage = "Season"
+                    elif normal_stage:
+                        current_stage = "Normal"
+
+                    stage_fail_count += 1
+                    if stage_cancel:
+                        pyautogui.click(stage_cancel)
+                        time.sleep(3)
+                        cancel_alert = find_image_on_screen(AFK_Stage_Images_route + '/Cancel_Alert.PNG', threshold=0.8)
+                        if cancel_alert:
+                            yes_button = find_image_on_screen(AFK_Stage_Images_route + '/Yes_Button.PNG',
+                                                                threshold=0.8)
+                            pyautogui.click(yes_button)
+                            time.sleep(3)
+                            break
+                else:
+                    time.sleep(3)
+
         else:
-            print("전투 중")
+            # print("전투 중")
             time.sleep(2)
