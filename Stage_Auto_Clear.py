@@ -60,6 +60,7 @@ for try_count in range(100000):
         stage_fail = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Fail.PNG', threshold=0.8)
         stage_clear = find_image_on_screen(AFK_Stage_Images_route + '/Stage_Clear.PNG', threshold=0.8)
         first_multi_clear = find_image_on_screen(AFK_Stage_Images_route + '/First_Multi_Clear.PNG', threshold=0.8)
+        first_multi_fail = find_image_on_screen(AFK_Stage_Images_route + '/Multi_Battle_Fail.PNG', threshold=0.8)
         main_screen = find_image_on_screen(AFK_Stage_Images_route + '/Main_Screen.PNG', threshold=0.8)
 
         if main_screen:
@@ -157,6 +158,14 @@ for try_count in range(100000):
             time.sleep(3)
             pyautogui.click(battle_retry)
 
+        # 멀티 첫번째 스테이지 실패
+        elif first_multi_fail:
+            print("멀티 스테이지 첫번째 스테이지 실패")
+            stage_fail_count += 1
+            next_multi_stage = find_image_on_screen(AFK_Stage_Images_route + '/Next_Multi.PNG', threshold=0.8)
+            pyautogui.click(next_multi_stage)
+            time.sleep(3)
+
         # 스테이지 클리어 후 다음 스테이지로 이동
         elif stage_clear:
             print("스테이지 클리어")
@@ -197,6 +206,17 @@ for try_count in range(100000):
             battle_start = find_image_on_screen(AFK_Stage_Images_route + '/Battle_Start.PNG', threshold=0.8)
             pyautogui.click(battle_start)
             time.sleep(3)
+
+            # 진영 버프 미 배치 혹은 진영 버프 비활성화, 듀라 버프 영웅을 사용 하지 않아도 전투를 하도록 처리
+            no_trait_bonus = find_image_on_screen(AFK_Stage_Images_route + '/No_Trait_Bonus.PNG', threshold=0.8)
+            no_buff_hero = find_image_on_screen(AFK_Stage_Images_route + '/No_Buff_Hero.PNG', threshold=0.8)
+            no_season_buff = find_image_on_screen(AFK_Stage_Images_route + '/No_Season_Buff.PNG', threshold=0.8)
+            no_echo = find_image_on_screen(AFK_Stage_Images_route + '/No_Echo.PNG', threshold=0.8)
+
+            if no_trait_bonus or no_buff_hero or no_season_buff or no_echo:
+                yes_button = find_image_on_screen(AFK_Stage_Images_route + '/Yes_Button.PNG', threshold=0.8)
+                pyautogui.click(yes_button)
+                time.sleep(3)
 
             while True:
                 multi_battle_fail = find_image_on_screen(AFK_Stage_Images_route + '/Next_Multi.PNG', threshold=0.8)
